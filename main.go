@@ -49,10 +49,10 @@ func main() {
 			usage(nIO)
 			os.Exit(0)
 		}
-		if newT, err := time.Parse("2006-1-2", arg); err != nil {
+		if newT, err := time.ParseInLocation("2006-1-2", arg, time.Local); err != nil {
 			failed(fmt.Sprintf("Invalid time format. %v\n", err))
 		} else {
-			t = newT.Local()
+			t = newT
 		}
 	default:
 		failed(fmt.Sprintf("Invalid argument number. got=%v, want=%v", len(os.Args), "1 or 2"))
