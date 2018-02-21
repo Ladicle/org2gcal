@@ -68,6 +68,7 @@ func main() {
 	fmt.Fprintln(nIO, "input time logs:")
 	r := bufio.NewReader(os.Stdin)
 	var events []Event
+	var startTime *time.Time
 	for {
 		rlb, _, err := r.ReadLine()
 		if err != nil {
@@ -87,8 +88,12 @@ func main() {
 		if err != nil {
 			failed(err.Error())
 		}
-		events = append(events,
-			NewEvent(log[1], t.Add(time.Hour*time.Duration(h)+time.Minute*time.Duration(m))))
+		endTime := t.Add(time.Hour*time.Duration(h) + time.Minute*time.Duration(m))
+		if startTime == nil {
+			startTime = &endTime
+		}
+		events = append(events, NewEvent(log[1], *startTime, endTime))
+		startTime = &endTime
 	}
 
 	if d, err := json.Marshal(events); err != nil {
@@ -104,13 +109,13 @@ func failed(message string) {
 	os.Exit(1)
 }
 
-func NewEvent(summary string, start time.Time) Event {
+func NewEvent(summary string, start, end time.Time) Event {
 	return Event{
 		CalendarID: calendarID,
 		Resource: EventResource{
 			Summary: summary,
 			Start:   NewEventTime(start),
-			End:     NewEventTime(start.Add(time.Minute * 15)),
+			End:     NewEventTime(end),
 		},
 	}
 }
