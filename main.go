@@ -38,24 +38,23 @@ func main() {
 		calendarID = "primary"
 	}
 
-	var t time.Time
-
+	var date string
 	switch len(os.Args) {
 	case 1:
-		t = time.Now()
+		date = time.Now().Format("2006-1-2")
 	case 2:
-		arg := os.Args[1]
-		if arg == "--help" {
+		if os.Args[1] == "--help" {
 			usage(nIO)
 			os.Exit(0)
 		}
-		if newT, err := time.ParseInLocation("2006-1-2", arg, time.Local); err != nil {
-			failed(fmt.Sprintf("Invalid time format. %v\n", err))
-		} else {
-			t = newT
-		}
+		date = os.Args[1]
 	default:
 		failed(fmt.Sprintf("Invalid argument number. got=%v, want=%v", len(os.Args), "1 or 2"))
+	}
+
+	t, err := time.ParseInLocation("2006-1-2", date, time.Local)
+	if err != nil {
+		failed(err.Error())
 	}
 
 	f, _ := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
