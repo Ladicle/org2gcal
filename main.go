@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -64,16 +65,16 @@ func main() {
 		f.Close()
 	}()
 
-	fmt.Fprintln(nIO, "input time logs:")
-	r := bufio.NewReader(os.Stdin)
+	body, err := ioutil.ReadAll(os.Stdin)
+	if err != nil {
+		panic(err)
+	}
+	lines := strings.Split(string(body), "\n")
+
 	var events []Event
 	var startTime *time.Time
-	for {
-		rlb, _, err := r.ReadLine()
-		if err != nil {
-			failed(fmt.Sprintf("Failed to read input. %v\n", err))
-		}
-		line := strings.TrimSpace(string(rlb))
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
 		if line == "" {
 			break
 		}
